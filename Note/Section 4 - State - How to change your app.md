@@ -59,7 +59,7 @@
 - Mỗi lần gọi setter function (`setCount`), toàn bộ component function sẽ được React gọi lại từ đầu (không phải chỉ update 1 phần) - đây gọi là re-render
 - Lần render đầu tiên (khi mới load trang): React lấy giá trị mặc định truyền vào `useState(0)` gán cho `count`, giá trị mặc định này chỉ dùng đúng 1 lần duy nhất rồi bỏ đi, không bao giờ dùng lại
 - Từ lần render thứ 2 trở đi: `count` sẽ lấy đúng giá trị mà mình vừa truyền vào setter function ở lần gọi trước đó, không còn liên quan gì đến giá trị mặc định ban đầu
-- Luồng cụ thể: user click → gọi `handleClick` → gọi `setCount(count + 1)` → React nhận thấy state thay đổi → tự động re-render (gọi lại toàn bộ function component) → lần này `count` = giá trị mới vừa set → JSX trả về hiển thị giá trị mới trên màn hình
+- Luồng cụ thể: user click -> gọi `handleClick` -> gọi `setCount(count + 1)` -> React nhận thấy state thay đổi -> tự động re-render (gọi lại toàn bộ function component) -> lần này `count` = giá trị mới vừa set -> JSX trả về hiển thị giá trị mới trên màn hình
 - Quá trình này lặp lại liên tục mỗi khi setter function được gọi - phải hình dung component được gọi đi gọi lại nhiều lần, không phải chỉ chạy 1 lần duy nhất
 - Có thể tùy chỉnh mức tăng mỗi lần bằng cách đổi giá trị truyền vào setter, ví dụ `setCount(count + 5)` thay vì `+ 1`
 
