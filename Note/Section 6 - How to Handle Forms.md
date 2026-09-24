@@ -75,7 +75,7 @@ array.map(item => item.id === targetId ? { ...item, updatedField: newValue } : i
 - Vì vậy, kỹ thuật "tạo mảng mới nhưng vẫn sửa trực tiếp object cũ bên trong" (VD `book.title = newTitle` rồi đưa vào mảng mới) VẪN hoạt động bình thường ở hiện tại - app vẫn re-render đúng, không lỗi ngay lập tức
 - Vấn đề chỉ lộ ra khi áp dụng thêm 1 optimization phổ biến ở tầng component con: chỉ re-render component đó nếu props nhận vào là 1 reference khác so với lần trước (so sánh reference của chính object, không so sánh nội dung bên trong)
 - Nếu object bên trong bị mutate trực tiếp (không được tạo mới), nó vẫn là CÙNG 1 reference trong bộ nhớ giữa lần render cũ và mới - dù nội dung (property) đã đổi, optimization ở component con sẽ nhầm tưởng "props không đổi" và bỏ qua re-render, khiến UI không cập nhật dù state cha đã thay đổi đúng
-- Đây chính là lý do dù cấp mảng đã handle đúng, vẫn PHẢI recreate cả object bên trong (không chỉ mutate) khi update - để đảm bảo tính đúng đắn khi sau này áp dụng các kỹ thuật tối ưu performance dựa trên so sánh reference (sẽ học kỹ hơn ở phần sau của khóa học)
+- Đây chính là lý do dù cấp mảng đã handle đúng, vẫn PHẢI recreate cả object bên trong (không chỉ mutate) khi update - để đảm bảo tính đúng đắn khi sau này áp dụng các kỹ thuật tối ưu performance dựa trên so sánh reference
 - Nguyên tắc rút ra: luôn tạo object/array mới ở MỌI CẤP bị thay đổi (không chỉ cấp ngoài cùng), để đảm bảo an toàn về lâu dài, dù hiện tại có vẻ như mutate trực tiếp vẫn "chạy được"
 
 ## Random
