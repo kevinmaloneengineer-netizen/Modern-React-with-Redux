@@ -26,7 +26,7 @@
 - **Application state**: state là "trọng tâm chính" của cả ứng dụng, được nhiều component khác nhau cần dùng đến (VD mảng `books` trong app quản lý sách - gần như mọi component đều quan tâm)
 - **Component state** (còn gọi là local state): state chỉ phục vụ 1 component (hoặc rất ít component liên quan trực tiếp), không component nào khác cần biết đến (VD `title` đang gõ trong form tạo/sửa sách, `showEdit` để toggle form ẩn/hiện)
 - Cách phân loại không có quy tắc tuyệt đối, mang tính chủ quan - các developer khác nhau có thể phân loại khác nhau cho cùng 1 trường hợp, đây là điều bình thường
-- Quy tắc thực hành: application state thường NÊN đưa vào Context để mọi nơi trong app đều truy cập dễ dàng; component state thường KHÔNG cần đưa vào Context vì không ai khác cần dùng tới, giữ nguyên `useState` cục bộ trong component đó là đủ
+- Quy tắc thực hành: application state thường NÊN đưa vào Context để mọi nơi trong app đều .truy cập dễ dàng; component state thường KHÔNG cần đưa vào Context vì không ai khác cần dùng tới, giữ nguyên `useState` cục bộ trong component đó là đủ
 - Ví dụ áp dụng vào app Reading List: `books` (ở App) → application state, nên đưa vào Context kèm các hàm thao tác (`createBook`, `editBookById`, `deleteBookById`...); `title` (ở BookCreate/BookEdit) và `showEdit` (ở BookShow) → component state, giữ nguyên cục bộ
 - Khái niệm này sẽ trở nên rất quan trọng khi học tới Redux sau này (Redux về bản chất là 1 cách quản lý tập trung cho "application state")
 
@@ -35,3 +35,11 @@
 - Refactor này ảnh hưởng tới nhiều component cùng lúc: mỗi component từng nhận props liên quan (VD `books`, `createBook`, `editBookById`, `deleteBookById`) đều cần sửa lại - bỏ phần nhận qua props, thêm phần lấy qua `useContext`
 - Đây là quá trình thực tế thường gặp trong dự án thật: hiếm khi thiết kế đúng ngay từ đầu, việc refactor lại cấu trúc data flow (chuyển từ props sang context, hoặc ngược lại) là chuyện bình thường và cần thiết khi app phát triển
 - Cách tiếp cận khi refactor: làm từng bước nhỏ, sửa từng phần rồi test lại app vẫn chạy đúng, thay vì cố sửa toàn bộ 1 lần - tránh dồn quá nhiều thay đổi cùng lúc dễ gây lỗi khó tìm
+
+## A Small Taste of Reusable Hooks
+- Hook: function do React cung cấp, thêm khả năng đặc biệt cho component, LUÔN bắt đầu bằng tiền tố `use` (VD `useState`, `useEffect`, `useContext`) - đây là quy ước nhận diện hook, không phải chỉ là tên gọi ngẫu nhiên
+- Custom hook: hook TỰ VIẾT (không phải React cung cấp sẵn), dùng để gói gọn 1 đoạn logic có thể tái sử dụng ở nhiều component - đây là 1 trong những cách chính để tái sử dụng code trong React (bên cạnh tái sử dụng qua component)
+- Custom hook đơn giản nhất chỉ là 1 function bọc quanh 1 hoặc nhiều hook có sẵn, ẩn bớt phần lặp lại (boilerplate) - VD gộp `useContext(BooksContext)` thành `useBooksContext()`
+- Quy trình tạo custom hook: viết 1 function nhỏ gọi hook có sẵn bên trong, return kết quả ra ngoài, rồi tách function đó ra 1 file riêng (thường đặt trong thư mục `src/hooks/`, đặt tên file khớp tên hook)
+- Lợi ích cụ thể: những nơi cần dùng context không phải viết lặp lại 2 dòng import (`useContext` + context object) ở mọi file, chỉ cần import đúng 1 custom hook và gọi nó - giảm boilerplate, dễ nhớ, dễ đọc code hơn
+- Custom hook có thể đơn giản (chỉ vài dòng như ví dụ này) hoặc phức tạp (chứa nhiều logic hơn) - độ phức tạp tuỳ vào nhu cầu tái sử dụng thực tế của dự án
