@@ -1,0 +1,22 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "name": "Myra"
+    },
+    {
+      "name": "Marguerite Reynolds",
+      "id": 2
+    },
+    {
+      "name": "Carlos Franey",
+      "id": 3
+    },
+    {
+      "name": "Duane Russel",
+      "id": 4
+    }
+  ],
+  "albums": [],
+  "photos": []
+}

@@ -46,7 +46,7 @@
   - Phần đầu: lấy các phần tử trước vị trí cần chèn
   - Chèn phần tử mới vào giữa
   - Phần sau: lấy các phần tử từ vị trí đó trở đi
-- Kỹ thuật này cũng dùng được để chèn vào đầu hoặc cuối mảng, nhưng phức tạp hơn hẳn so với cách spread đơn giản đã học trước đó (`[newItem, ...array]` hoặc `[...array, newItem]`) - nên chỉ cần dùng `slice` khi thực sự cần chèn vào giữa
+- Kỹ thuật này cũng dùng được để chèn vào đầu hoặc cuối mảng, nhưng phức tạp hơn hẳn so với cách spread đơn giản  (`[newItem, ...array]` hoặc `[...array, newItem]`) - nên chỉ cần dùng `slice` khi thực sự cần chèn vào giữa
 
 ## Removing Elements
 - `array.filter(callback)` trả về 1 mảng MỚI, chỉ giữ lại những phần tử mà callback trả về truthy - không mutate mảng gốc
@@ -89,5 +89,5 @@ array.map(item => item.id === targetId ? { ...item, updatedField: newValue } : i
 ## Rendering the Books List
 - Pattern quen thuộc: parent (App) giữ state mảng (`books`), truyền xuống List component qua props (`<BookList books={books} />`), List component `map()` qua từng phần tử để tạo component con cho từng item (`<BookShow key={book.id} book={book} />`), component con nhận đúng 1 object và hiển thị field cần thiết (`book.title`)
 - Đặt tên prop: theo nội dung dữ liệu đang truyền, số ít cho 1 item (VD `book`), số nhiều cho cả mảng (VD `books`) - giúp code dễ đọc, phân biệt rõ cấp component nào đang xử lý 1 item hay cả danh sách
-- key khi map list dùng `book.id` (ID đã có sẵn từ data) - đúng theo yêu cầu key phải duy nhất và ổn định đã học trước đó
+- key khi map list dùng `book.id` (ID đã có sẵn từ data) - đúng theo yêu cầu key phải duy nhất và ổn định 
 - Đây là ví dụ thực tế hoàn chỉnh của luồng: App (state) → List (nhận props, map) → Show (nhận props, hiển thị) - luồng dữ liệu 1 chiều cha xuống con qua nhiều cấp component

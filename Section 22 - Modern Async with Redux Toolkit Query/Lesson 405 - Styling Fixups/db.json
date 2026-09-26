@@ -1,0 +1,48 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "name": "Myra"
+    },
+    {
+      "name": "Elsie Price",
+      "id": 3
+    },
+    {
+      "name": "Harold Strosin",
+      "id": 4
+    },
+    {
+      "name": "Mr. Juana King",
+      "id": 5
+    }
+  ],
+  "albums": [
+    {
+      "id": 10,
+      "title": "Hiking Trip",
+      "userId": 1
+    },
+    {
+      "userId": 1,
+      "title": "Awesome Fresh Gloves",
+      "id": 11
+    },
+    {
+      "userId": 1,
+      "title": "Small Metal Sausages",
+      "id": 12
+    },
+    {
+      "userId": 1,
+      "title": "Intelligent Metal Chair",
+      "id": 13
+    },
+    {
+      "userId": 1,
+      "title": "Bespoke Rubber Shirt",
+      "id": 14
+    }
+  ],
+  "photos": []
+}

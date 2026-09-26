@@ -25,7 +25,7 @@ Card.propTypes = {
 - Hỗ trợ VALIDATION TÙY CHỈNH (custom validation): thay vì gán 1 kiểu có sẵn, có thể gán 1 FUNCTION tự viết - function này nhận vào toàn bộ props object làm argument đầu tiên, cho phép kiểm tra logic phức tạp liên quan tới NHIỀU prop cùng lúc (VD kiểm tra chỉ được đúng 1 trong nhiều prop Boolean là `true` tại 1 thời điểm) - nếu phát hiện lỗi, return về 1 object `Error` để báo warning
 
 ## Introducing TailwindCSS
-- Về bản chất, TailwindCSS vẫn là CSS library như Bulma đã học trước đó (đều cho sẵn 1 bộ className kèm style tương ứng), nhưng khác biệt cốt lõi: mỗi className của Tailwind chỉ gắn với ĐÚNG 1 rule CSS duy nhất (VD `block`, `mr-1`, `w-2`, `text-white`), thay vì 1 className gắn với nhiều rule cùng lúc như Bulma (`.card` có sẵn nhiều style gộp lại)
+- Về bản chất, TailwindCSS vẫn là CSS library như Bulma  (đều cho sẵn 1 bộ className kèm style tương ứng), nhưng khác biệt cốt lõi: mỗi className của Tailwind chỉ gắn với ĐÚNG 1 rule CSS duy nhất (VD `block`, `mr-1`, `w-2`, `text-white`), thay vì 1 className gắn với nhiều rule cùng lúc như Bulma (`.card` có sẵn nhiều style gộp lại)
 - Vì mỗi className chỉ làm 1 việc, muốn style 1 phần tử đầy đủ phải liệt kê rất nhiều className cùng lúc trên 1 element - gọi vui là "className soup" (súp className) - khiến JSX trông rối, khó đọc, phải nhớ/tra rất nhiều tên className riêng lẻ
 - Một số CSS feature vẫn không làm tốt được với cách tiếp cận utility-class của Tailwind
 - Lý do THỰC SỰ khoá học chọn dùng Tailwind: không phải vì bản thân Tailwind "hay" hơn, mà vì cách viết className dài dòng này VÔ TÌNH ép buộc developer phải tách nhỏ component ra thành các phần tái sử dụng được - nếu không tách nhỏ, code sẽ trở nên cực kỳ khó đọc/khó bảo trì

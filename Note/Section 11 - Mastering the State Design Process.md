@@ -19,3 +19,31 @@ Quy trình 8 bước để xác định: cần bao nhiêu piece of state, tên/k
   - KHÔNG → đặt state ngay bên trong chính component đó (local state), không cần đẩy lên cao hơn
 - Event handler nên được ĐỊNH NGHĨA (không phải "dùng") ở CÙNG component với state mà nó thay đổi - dù có thể truyền xuống dùng ở component con khác qua props
 - Quy trình này đặc biệt hữu ích khi thiết kế component PHỨC TẠP - với component đơn giản có thể thấy hơi rườm rà, nhưng giá trị thực sự phát huy khi bài toán khó hơn
+
+## Finding the Expanded Item
+- Dùng useState(0) cho expandedIndex, khởi tạo item đầu tiên mở sẵn
+- Trong map((item, index) => ...), so sánh index === expandedIndex để biết item hiện tại có đang expanded hay không
+- Nên tạo biến trung gian isExpanded = index === expandedIndex để tránh lặp lại phép so sánh nhiều lần trong cùng 1 lần map, dùng chung cho cả việc show/hide content lẫn hiển thị icon
+
+## Conditional Rendering
+- React KHÔNG render Boolean, null, hay undefined ra màn hình - trả về các giá trị này trong JSX sẽ không hiển thị gì cả (khác với string/number, luôn hiển thị)
+- Nhắc lại quy tắc short-circuit của JS: || trả về giá trị TRUTHY đầu tiên; && trả về giá trị FALSY đầu tiên (nếu có) hoặc giá trị TRUTHY cuối cùng
+- Kết hợp 2 quy tắc trên để ẩn/hiện HOÀN TOÀN 1 phần JSX (không chỉ dùng CSS ẩn mà là không render luôn): {isExpanded && <div>{item.content}</div>}
+  - Nếu isExpanded là true → trả về div (giá trị truthy cuối)
+  - Nếu isExpanded là false → trả về false (giá trị falsy đầu) → React không hiển thị gì
+- Đây gọi là "conditional rendering" - kỹ thuật cực kỳ phổ biến, sẽ dùng liên tục trong mọi component React
+
+## Understanding the Issue (Stale State Bug khi Click Nhanh)
+- Bug minh hoạ: click 2 lần rất nhanh (mô phỏng bằng $0.click(); $0.click(); trong console) vào cùng accordion header có thể khiến panel bị đóng sai, không mở lại như mong đợi
+- Nguyên nhân gốc: React KHÔNG update state ngay lập tức khi gọi setter function - có 1 độ trễ nhỏ (gọi là batching, giúp gom nhiều lần update lại xử lý cùng lúc để tối ưu hiệu năng)
+- Nếu click lần 2 xảy ra TRƯỚC KHI React kịp xử lý xong update của lần click 1, thì trong lần click 2, biến state đọc được vẫn là giá trị CŨ (chưa cập nhật) - dẫn tới logic tính toán bị sai vì dựa trên dữ liệu đã "cũ" (stale)
+- Có thể verify bug này bằng cách thêm console.log giá trị state ngay đầu event handler - sẽ thấy nó không đổi dù đã gọi setter trước đó
+
+## Applying the Fix (Functional State Updates)
+- 2 hướng giải quyết bug stale state: (1) ép React update ngay lập tức (không nên, làm mất lợi ích tối ưu của batching), (2) dùng functional update - đây là cách được chọn
+- Cú pháp thông thường (dễ dính bug khi update dựa trên giá trị cũ): setCounter(counter + 1)
+- Cú pháp functional update: setCounter(currentCounter => currentCounter + 1) - truyền vào 1 FUNCTION thay vì giá trị trực tiếp
+- Quy tắc quan trọng: argument đầu tiên của function này LUÔN LUÔN là giá trị mới nhất, cập nhật nhất của state đó (kể cả khi có nhiều lần gọi setter xếp hàng chờ xử lý) - không bị stale
+- Chỉ cần RETURN giá trị mới mong muốn từ trong function đó, không cần gọi lại setter thêm lần nào khác
+- Khi nào nên dùng functional update: chỉ cần cân nhắc khi giá trị state MỚI phụ thuộc vào giá trị state CŨ (VD tăng/giảm dựa trên giá trị hiện tại, so sánh điều kiện dựa trên giá trị hiện tại) - đây chính là trường hợp dễ dính bug stale value
+- Trên thực tế, bug này RẤT HIẾM xảy ra với user thật (vì không ai click nhanh tới mức đó) - nên phần lớn code thực tế vẫn dùng cách đơn giản; chỉ cần cân nhắc functional update khi app phức tạp, có nhiều state tương tác với nhau

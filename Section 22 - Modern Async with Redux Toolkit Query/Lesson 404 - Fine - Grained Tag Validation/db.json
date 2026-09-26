@@ -1,0 +1,54 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "name": "Myra"
+    },
+    {
+      "name": "Elsie Price",
+      "id": 3
+    },
+    {
+      "name": "Harold Strosin",
+      "id": 4
+    }
+  ],
+  "albums": [
+    {
+      "id": 10,
+      "title": "Hiking Trip",
+      "userId": 1
+    },
+    {
+      "userId": 1,
+      "title": "Awesome Fresh Gloves",
+      "id": 11
+    },
+    {
+      "userId": 1,
+      "title": "Small Metal Sausages",
+      "id": 12
+    },
+    {
+      "userId": 1,
+      "title": "Elegant Bronze Hat",
+      "id": 13
+    },
+    {
+      "userId": 1,
+      "title": "Practical Steel Bacon",
+      "id": 14
+    },
+    {
+      "userId": 1,
+      "title": "Electronic Cotton Mouse",
+      "id": 15
+    },
+    {
+      "userId": 1,
+      "title": "Oriental Steel Pants",
+      "id": 16
+    }
+  ],
+  "photos": []
+}

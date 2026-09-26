@@ -1,0 +1,30 @@
+## Thinking About Derived State
+- Quy trình xác định state cho ứng dụng Redux: (1) liệt kê hết những gì thay đổi trên màn hình, (2) xác định user thao tác gì gây ra thay đổi đó, (3) gom nhóm các state liên quan, tạo 1 slice riêng cho từng nhóm - về bản chất y hệt State Design Process đã học trước đây, chỉ khác chỗ chứa (Redux store thay vì component)
+- **Derived state**: KHÔNG phải 1 tính năng đặc biệt của React/Redux, mà chỉ là 1 KHÁI NIỆM - dữ liệu hiển thị trên màn hình mà thay vì LƯU riêng thành 1 piece of state, có thể TÍNH TOÁN ra được từ những state đã có sẵn, bằng JavaScript thuần
+- Dấu hiệu nhận biết derived state: khi thấy nội dung trên màn hình thay đổi, đừng vội kết luận "cần thêm state mới" - hãy tự hỏi: giá trị này có thể tính ra được từ state đã tồn tại không? (VD tổng chi phí = duyệt qua mảng xe, cộng dồn cost của từng xe → không cần lưu riêng piece of state "totalCost")
+- Lợi ích của việc nhận diện đúng derived state: giảm số lượng state cần quản lý, tránh dữ liệu bị TRÙNG LẶP/KHÔNG ĐỒNG BỘ (VD nếu lưu riêng `totalCost` mà quên cập nhật khi `cars` đổi, 2 giá trị sẽ lệch nhau) - đặc biệt quan trọng khi app lớn dần, càng ít state trực tiếp càng dễ maintain
+
+## Maintaining a Collection with a Slice (Quản lý danh sách bằng Slice)
+- Khi 1 slice cần quản lý danh sách (mảng object, VD danh sách xe), thường thiết kế `initialState` là 1 OBJECT gồm nhiều property phụ trợ (VD `{ searchTerm: '', cars: [] }`), KHÔNG chỉ đơn thuần là 1 mảng trần
+- Mỗi item trong mảng nên có 1 ID DUY NHẤT để phân biệt (ngay cả khi 2 item có dữ liệu giống hệt nhau, VD 2 xe cùng tên cùng giá) - dùng `nanoid` (import từ `@reduxjs/toolkit`) để tự động sinh ID ngẫu nhiên, đây là tiện ích có sẵn của Redux Toolkit, không có gì đặc biệt về mặt kỹ thuật so với các cách generate ID khác
+- Vấn đề "giả định ngầm" giữa các slice: khi 1 mini-reducer (VD `addCar` trong carsSlice) cần dữ liệu đang được QUẢN LÝ BỞI SLICE KHÁC (VD tên/giá xe đang nằm trong formSlice) - vì 1 slice KHÔNG BAO GIỜ được phép đọc trực tiếp state của slice khác, reducer đó buộc phải GIẢ ĐỊNH rằng `action.payload` sẽ có đúng cấu trúc cần thiết (VD `{ name, cost }`) do nơi gọi `dispatch` tự đóng gói sẵn và truyền vào
+- Đây là TRÁCH NHIỆM của người viết code ở phía gọi `dispatch` - phải đảm bảo LUÔN truyền đúng payload theo đúng cấu trúc mà reducer mong đợi, vì reducer không có cách nào tự kiểm tra hay lấy dữ liệu từ nơi khác
+- Thao tác XOÁ 1 item khỏi mảng theo ID: dùng `.filter()` để tạo mảng mới, giữ lại các phần tử có ID KHÁC với ID cần xoá (`car.id !== action.payload`), rồi gán mảng mới đó cho property tương ứng trong state
+
+## Awkward Double Keys (Đặt tên key trùng lặp gây rối)
+- Vấn đề: khi tên KEY của slice trong `configureStore` (VD `cars: carsSlice.reducer`) TRÙNG với tên PROPERTY bên trong `initialState` của chính slice đó (VD state có `{ cars: [...] }`), sẽ dẫn tới cách truy cập bị lặp từ chữ khó đọc: `state.cars.cars` - đây KHÔNG PHẢI bug, chỉ là hệ quả tự nhiên khi đặt tên trùng nhau không cẩn thận
+- Cách khắc phục: đổi tên 1 trong 2 chỗ (thường đổi tên property BÊN TRONG slice, VD đổi `cars` thành `data` hoặc `list` hoặc `entities`) - để tránh việc truy cập bị lặp chữ gây khó hiểu cho người đọc code khác (dễ tưởng là lỗi đánh máy)
+- Bài học tổng quát: cần CHÚ Ý trước khi đặt tên key ở `configureStore` VÀ tên property trong `initialState` của từng slice - vì khi 2 tên này trùng nhau, code truy cập state cuối cùng sẽ luôn có dạng lặp chữ khó đọc
+
+## Reminder on ExtraReducers
+- Nhắc lại + minh hoạ thêm 1 use case thực tế cho `extraReducers`: 1 slice (VD `formSlice`) có thể lắng nghe action creator ĐƯỢC EXPORT từ 1 SLICE KHÁC (VD `addCar` từ `carsSlice`) mà không cần biết action đó thuộc slice nào về mặt kỹ thuật
+- Nên IMPORT trực tiếp action creator function (VD `import { addCar } from './carsSlice'`) rồi truyền THẲNG function đó vào `builder.addCase(addCar, handler)` - KHÔNG nên tự gõ tay string action type (VD `'cars/addCar'`) để tránh rủi ro gõ sai chính tả, dù cả 2 cách đều hoạt động được về mặt kỹ thuật
+- Use case cụ thể: khi 1 form (formSlice) cần TỰ RESET lại các trường nhập liệu (`name`, `cost`) ngay sau khi 1 slice khác (carsSlice) xử lý xong action `addCar` - đây là ví dụ điển hình của việc 1 slice "phản ứng" theo hành động xảy ra ở slice khác, không cần phải tự dispatch thêm 1 action riêng nào khác cho việc reset form
+
+## Derived State in useSelector (Đào sâu: nơi nào NÊN và KHÔNG NÊN tính derived state)
+- Áp dụng thực tế derived state: tính năng LỌC (filter) danh sách xe theo `searchTerm` - đây là derived state điển hình, tính toán từ 2 piece of state có sẵn (`data` và `searchTerm`), không cần lưu riêng 1 state mới cho "danh sách đã lọc"
+- Vị trí lý tưởng để đặt logic tính derived state: NGAY BÊN TRONG hàm selector truyền vào `useSelector` - giúp phần còn lại của component chỉ làm việc với dữ liệu ĐÃ ĐƯỢC XỬ LÝ SẴN, không cần biết gì về dữ liệu gốc chưa lọc
+- Pattern hay dùng để code selector dễ đọc hơn: DESTRUCTURE trực tiếp trên argument của selector function để lấy đúng phần state cần dùng, tránh viết lặp đường dẫn dài (VD `({ cars: { data, searchTerm } }) => ...` thay vì lặp lại `state.cars.data`, `state.cars.searchTerm` nhiều lần)
+- **NGOẠI LỆ quan trọng - KHÔNG PHẢI derived state nào cũng nên tính trong `useSelector`:** với tính năng "in đậm (bold) tên xe nếu trùng khớp với tên đang gõ trong form" - KHÔNG nên gắn thêm property tuỳ ý (VD `bold: true`) vào chính OBJECT DỮ LIỆU (car object) chỉ để phục vụ UI
+- Lý do: object dữ liệu (car) nên đại diện đúng cho MÔ HÌNH DỮ LIỆU thuần tuý (chỉ có `id`, `name`, `cost`) - không nên trộn lẫn KHÁI NIỆM UI (trạng thái hiển thị, như có bold hay không) vào TRONG chính data model, vì 2 khái niệm này (dữ liệu vs trạng thái hiển thị) nên được xem là 2 THỰC THỂ TÁCH BIỆT
+- Giải pháp đúng: lấy CẢ 2 nguồn dữ liệu cần thiết ra từ `useSelector` riêng biệt (VD danh sách xe VÀ tên đang gõ trong form, dù 2 cái này nằm ở 2 slice khác nhau) - rồi tính toán "có nên bold hay không" NGAY TẠI THỜI ĐIỂM RENDER, bên trong phần logic hiển thị JSX của component, KHÔNG tính sẵn trong selector
